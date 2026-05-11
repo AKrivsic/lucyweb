@@ -1,0 +1,144 @@
+.profile {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--spacing-4xl);
+  align-items: start;
+  position: relative;
+  isolation: isolate;
+}
+
+.profileImageSticky {
+  position: sticky;
+  top: calc(var(--spacing-2xl) + 80px);
+}
+
+.profileImage {
+  width: 100%;
+  position: relative !important;
+  overflow: hidden;
+  z-index: 0;
+  aspect-ratio: 3 / 4;
+  min-height: 300px;
+  contain: layout;
+  isolation: isolate;
+}
+
+.profileImageContent {
+  object-fit: cover;
+  position: absolute !important;
+  inset: 0;
+  z-index: 0;
+}
+
+.profileContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3xl);
+  position: relative;
+  z-index: 1;
+}
+
+.title {
+  font-size: var(--text-4xl);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+}
+
+.text {
+  font-size: var(--text-lg);
+  line-height: var(--leading-loose);
+  color: var(--color-text);
+  position: relative;
+  z-index: 1;
+}
+
+.text p {
+  margin-bottom: var(--spacing-lg);
+}
+
+.text p:last-child {
+  margin-bottom: 0;
+}
+
+.values {
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--color-border);
+  position: relative;
+  z-index: 1;
+}
+
+.valuesTitle {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 400;
+}
+
+.valuesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.valuesItem {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);
+  padding-left: var(--spacing-lg);
+  position: relative;
+  margin-bottom: var(--spacing-sm);
+}
+
+.valuesItem::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+}
+
+.valuesItem:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .profile {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-3xl);
+  }
+
+  .profileImageSticky {
+    position: relative;
+    top: auto;
+  }
+
+  .profileImage {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: var(--text-3xl);
+  }
+
+  .text {
+    font-size: var(--text-base);
+  }
+
+  .valuesTitle {
+    font-size: var(--text-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .profileImage {
+    max-width: 100%;
+  }
+}

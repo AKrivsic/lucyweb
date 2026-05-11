@@ -1,0 +1,147 @@
+.title {
+  font-size: var(--text-4xl);
+  margin-bottom: var(--spacing-3xl);
+  font-weight: 400;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-2xl);
+  position: relative;
+  z-index: 1;
+}
+
+.projectCard {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-lg);
+  position: relative;
+}
+
+.projectCard:first-child {
+  grid-column: span 2;
+}
+
+.projectCard:hover {
+  opacity: 0.9;
+}
+
+.projectCard:hover .projectInfo {
+  opacity: 0.7;
+}
+
+.projectCard:hover .projectImageContent {
+  transform: scale(1.05);
+}
+
+.projectImage {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+  overflow: hidden;
+  position: relative !important;
+  aspect-ratio: 4 / 3;
+  min-height: 200px;
+  contain: layout;
+  isolation: isolate;
+}
+
+.projectCard:first-child .projectImage {
+  aspect-ratio: 16 / 9;
+}
+
+.projectImageContent {
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  position: absolute !important;
+  inset: 0;
+  z-index: 0;
+}
+
+.projectInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  transition: opacity 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.projectTitle {
+  font-size: var(--text-xl);
+  font-weight: 400;
+  margin: 0;
+  line-height: var(--leading-tight);
+}
+
+.projectCard:first-child .projectTitle {
+  font-size: var(--text-2xl);
+}
+
+.projectMeta {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: var(--text-xs);
+  color: var(--color-text-light);
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.projectLocation::after {
+  content: ' • ';
+  margin-left: var(--spacing-md);
+}
+
+.projectYear {
+  color: var(--color-text-light);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xl);
+  }
+
+  .projectCard:first-child {
+    grid-column: auto;
+  }
+
+  .projectCard:first-child .projectImage {
+    aspect-ratio: 4 / 3;
+  }
+
+  .projectCard:first-child .projectTitle {
+    font-size: var(--text-xl);
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+  }
+
+  .projectCard {
+    padding-top: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--text-2xl);
+  }
+}
