@@ -5,21 +5,22 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './Header.module.css';
 
+const navLinks = [
+  { href: '/projekty', label: 'Projekty' },
+  { href: '/sluzby', label: 'Služby' },
+  { href: '/aktuality', label: 'Aktuality' },
+  { href: '/o-mne', label: 'O mně' },
+];
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
 
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
+  const closeMenu = () => setIsMenuOpen(false);
+  const toggleMenu = () => setIsMenuOpen((v) => !v);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  // Close menu on ESC key
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isMenuOpen) {
@@ -27,12 +28,10 @@ export default function Header() {
         buttonRef.current?.focus();
       }
     };
-
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
   }, [isMenuOpen]);
 
-  // Close menu on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -45,19 +44,12 @@ export default function Header() {
         closeMenu();
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen]);
 
-  // Prevent body scroll when menu is open
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
+    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
@@ -66,107 +58,69 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={`container ${styles.headerContainer}`}>
-        <Link href="/" className={styles.logo}>
-          Lucy Design
+        <Link href="/" className={styles.logo} onClick={closeMenu}>
+          Lucy Design<span className={styles.logoDot}>.</span>
         </Link>
-        <nav className={styles.nav}>
+
+        <nav className={styles.nav} aria-label="Hlavní navigace">
           <ul className={styles.navList}>
-            <li>
-              <Link 
-                href="/projekty"
-                className={pathname === '/projekty' ? styles.active : ''}
-              >
-                Projekty
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/sluzby"
-                className={pathname === '/sluzby' ? styles.active : ''}
-              >
-                Služby
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/o-mne"
-                className={pathname === '/o-mne' ? styles.active : ''}
-              >
-                O mně
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/kontakt"
-                className={pathname === '/kontakt' ? styles.active : ''}
-              >
-                Kontakt
-              </Link>
-            </li>
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className={`${styles.navLink} ${pathname === link.href ? styles.active : ''}`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
-          <Link href="/kontakt" className={styles.ctaButton}>
-            Konzultace
+          <Link href="/kontakt" className={`btn ${styles.cta}`}>
+            Kontakt
           </Link>
         </nav>
-        <button 
+
+        <button
           ref={buttonRef}
-          className={styles.hamburger}
+          className={`${styles.hamburger} ${isMenuOpen ? styles.hamburgerOpen : ''}`}
           onClick={toggleMenu}
-          aria-label="Toggle menu"
+          aria-label={isMenuOpen ? 'Zavřít menu' : 'Otevřít menu'}
           aria-expanded={isMenuOpen}
           aria-controls="mobile-nav"
         >
-          <span className={styles.hamburgerLine}></span>
-          <span className={styles.hamburgerLine}></span>
-          <span className={styles.hamburgerLine}></span>
+          <span className={styles.hamburgerLine} />
+          <span className={styles.hamburgerLine} />
+          <span className={styles.hamburgerLine} />
         </button>
+
         {isMenuOpen && (
-          <nav 
+          <nav
             ref={menuRef}
             id="mobile-nav"
             className={styles.mobileNav}
-            aria-label="Mobile navigation"
+            aria-label="Mobilní navigace"
           >
             <ul className={styles.mobileNavList}>
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={closeMenu}
+                    className={`${styles.mobileNavLink} ${
+                      pathname === link.href ? styles.active : ''
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
               <li className={styles.mobileCtaItem}>
-                <Link href="/kontakt" onClick={closeMenu} className={styles.mobileCtaButton}>
-                  Konzultace
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/projekty" 
+                <Link
+                  href="/kontakt"
                   onClick={closeMenu}
-                  className={pathname === '/projekty' ? styles.active : ''}
+                  className={`btn ${styles.mobileCta}`}
                 >
-                  Projekty
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/sluzby" 
-                  onClick={closeMenu}
-                  className={pathname === '/sluzby' ? styles.active : ''}
-                >
-                  Služby
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/o-mne" 
-                  onClick={closeMenu}
-                  className={pathname === '/o-mne' ? styles.active : ''}
-                >
-                  O mně
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/kontakt" 
-                  onClick={closeMenu}
-                  className={pathname === '/kontakt' ? styles.active : ''}
-                >
-                  Kontakt
+                  Domluvit konzultaci
                 </Link>
               </li>
             </ul>

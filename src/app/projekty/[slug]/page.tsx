@@ -2,19 +2,20 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import { notFound } from 'next/navigation';
 import { projects } from '@/data/projects';
 import styles from './page.module.css';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default function ProjectDetail({ params }: PageProps) {
-  const project = projects.find((p) => p.slug === params.slug);
+  const { slug } = use(params);
+  const project = projects.find((p) => p.slug === slug);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -26,7 +27,6 @@ export default function ProjectDetail({ params }: PageProps) {
     notFound();
   }
 
-  // Použijeme pole images z projektu
   const images = project.images;
 
   const openLightbox = (index: number, thumbnailElement: HTMLDivElement | null) => {
@@ -39,7 +39,6 @@ export default function ProjectDetail({ params }: PageProps) {
 
   const closeLightbox = () => {
     setLightboxOpen(false);
-    // Return focus to the thumbnail that opened the lightbox
     if (lastFocusedThumbnailRef.current) {
       lastFocusedThumbnailRef.current.focus();
       lastFocusedThumbnailRef.current = null;
@@ -54,45 +53,29 @@ export default function ProjectDetail({ params }: PageProps) {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  // ESC key handler
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && lightboxOpen) {
-        closeLightbox();
-      }
+      if (e.key === 'Escape' && lightboxOpen) closeLightbox();
     };
-
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
   }, [lightboxOpen]);
 
-  // Prevent body scroll when lightbox is open
   useEffect(() => {
-    if (lightboxOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
+    document.body.style.overflow = lightboxOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
   }, [lightboxOpen]);
 
-  // Focus on close button when lightbox opens
   useEffect(() => {
     if (lightboxOpen && closeButtonRef.current) {
-      // Small delay to ensure modal is rendered
-      setTimeout(() => {
-        closeButtonRef.current?.focus();
-      }, 0);
+      setTimeout(() => closeButtonRef.current?.focus(), 0);
     }
   }, [lightboxOpen]);
 
-  // Arrow keys handler
   useEffect(() => {
     if (!lightboxOpen) return;
-
     const handleArrowKeys = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
         setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -100,15 +83,12 @@ export default function ProjectDetail({ params }: PageProps) {
         setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
       }
     };
-
     document.addEventListener('keydown', handleArrowKeys);
     return () => document.removeEventListener('keydown', handleArrowKeys);
   }, [lightboxOpen, images.length]);
 
-  // Focus trap - prevent tabbing outside modal
   useEffect(() => {
     if (!lightboxOpen || !modalRef.current) return;
-
     const modal = modalRef.current;
     const focusableElements = modal.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -118,19 +98,14 @@ export default function ProjectDetail({ params }: PageProps) {
 
     const handleTabKey = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
-
       if (e.shiftKey) {
-        // Shift + Tab
         if (document.activeElement === firstElement) {
           e.preventDefault();
           lastElement?.focus();
         }
-      } else {
-        // Tab
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement?.focus();
-        }
+      } else if (document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement?.focus();
       }
     };
 
@@ -140,24 +115,25 @@ export default function ProjectDetail({ params }: PageProps) {
 
   return (
     <>
-      <section className="section">
+      <section className={`section ${styles.section}`}>
         <div className="container">
           <Link href="/projekty" className={styles.backLink}>
-            ← Zpět na projekty
+            <span aria-hidden>←</span> Zpět na projekty
           </Link>
 
-          <div className={styles.header}>
-            <div className={styles.meta}>
-              <span className={styles.location}>{project.location}</span>
-              <span className={styles.year}>{project.year}</span>
+          <header className={styles.header}>
+            <div className={styles.headerMeta}>
+              <span className="eyebrow">
+                {project.location}, {project.year}
+              </span>
             </div>
             <h1 className={styles.title}>{project.title}</h1>
-          </div>
+          </header>
 
           <div className={styles.gallery}>
             {images.map((imageSrc, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 ref={(el) => {
                   thumbnailRefs.current[idx] = el;
                 }}
@@ -172,16 +148,15 @@ export default function ProjectDetail({ params }: PageProps) {
                 tabIndex={0}
                 role="button"
                 aria-label={`Otevřít obrázek ${idx + 1} z galerie`}
-                style={{ cursor: 'pointer' }}
               >
                 <Image
                   src={imageSrc}
-                  alt={`${project.title} - obrázek ${idx + 1}`}
+                  alt={`${project.title} — obrázek ${idx + 1}`}
                   fill
                   priority={idx === 0}
-                  sizes={idx === 0 
-                    ? "(max-width: 768px) 100vw, 66vw" 
-                    : "(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  sizes={idx === 0
+                    ? '(max-width: 768px) 100vw, 66vw'
+                    : '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'
                   }
                   className={styles.galleryImage}
                   style={{ objectFit: 'cover' }}
@@ -192,11 +167,12 @@ export default function ProjectDetail({ params }: PageProps) {
 
           <div className={styles.content}>
             <div className={styles.description}>
+              <span className="eyebrow">O projektu</span>
               <p>{project.description}</p>
             </div>
 
             <div className={styles.scope}>
-              <h2 className={styles.scopeTitle}>Rozsah</h2>
+              <span className="eyebrow">Rozsah</span>
               <ul className={styles.scopeList}>
                 {project.scope.map((item, index) => (
                   <li key={index} className={styles.scopeItem}>
@@ -206,20 +182,28 @@ export default function ProjectDetail({ params }: PageProps) {
               </ul>
             </div>
           </div>
+
+          <div className={styles.ctaBlock}>
+            <p className={styles.ctaText}>
+              Máte podobný projekt? Pojďme si o&nbsp;tom popovídat.
+            </p>
+            <Link href="/kontakt" className="btn">
+              Domluvit konzultaci
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Lightbox Modal */}
       {lightboxOpen && (
-        <div 
+        <div
           ref={modalRef}
-          className={styles.lightboxOverlay} 
+          className={styles.lightboxOverlay}
           onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
-          aria-label={`Galerie obrázků: ${project.title}, obrázek ${currentImageIndex + 1} z ${images.length}`}
+          aria-label={`Galerie: ${project.title}, obrázek ${currentImageIndex + 1} z ${images.length}`}
         >
-          <button 
+          <button
             ref={closeButtonRef}
             className={styles.lightboxClose}
             onClick={closeLightbox}
@@ -227,10 +211,7 @@ export default function ProjectDetail({ params }: PageProps) {
           >
             ×
           </button>
-          <div 
-            className={styles.lightboxContent}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
             <button
               className={styles.lightboxArrow}
               onClick={(e) => {
@@ -244,7 +225,7 @@ export default function ProjectDetail({ params }: PageProps) {
             <div className={styles.lightboxImageWrapper}>
               <Image
                 src={images[currentImageIndex]}
-                alt={`${project.title} - obrázek ${currentImageIndex + 1} z ${images.length}`}
+                alt={`${project.title} — obrázek ${currentImageIndex + 1} z ${images.length}`}
                 fill
                 sizes="100vw"
                 className={styles.lightboxImage}

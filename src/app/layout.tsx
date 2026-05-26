@@ -1,24 +1,20 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  display: "swap",
-});
-
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Lucy Design",
-  description: "Interiérový design v Praze",
+  title: "Lucy Design — Interiérový design v Praze",
+  description:
+    "Interiérový design v Praze. Od konceptu po realizaci. Nadčasové interiéry s důrazem na detail.",
 };
 
 export default function RootLayout({
@@ -28,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="cs">
-      <body className={`${playfair.variable} ${inter.variable}`}>
+      <body className={inter.variable}>
         <Header />
         <main>{children}</main>
         <Footer />

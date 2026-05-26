@@ -2,236 +2,358 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
 import { projects } from '@/data/projects';
+import { posts, categories } from '@/data/posts';
 import styles from './page.module.css';
 
+const services = [
+  {
+    title: 'Interiérový koncept',
+    description:
+      'Komplexní návrh prostoru — dispozice, materiály, světlo a atmosféra v souladu s vaším životem.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+        <circle cx="6" cy="6" r="1.5" />
+        <line x1="10" y1="6" x2="18" y2="6" />
+        <circle cx="6" cy="12" r="1.5" />
+        <line x1="10" y1="12" x2="18" y2="12" />
+        <circle cx="6" cy="18" r="1.5" />
+        <line x1="10" y1="18" x2="18" y2="18" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Nábytek na míru',
+    description:
+      'Jedinečné kusy navržené přesně pro váš prostor — od kuchyně přes vestavěné skříně až po speciální solitéry.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+        <line x1="4" y1="7" x2="20" y2="7" />
+        <circle cx="9" cy="7" r="1.8" fill="currentColor" stroke="none" />
+        <line x1="4" y1="12" x2="20" y2="12" />
+        <circle cx="15" cy="12" r="1.8" fill="currentColor" stroke="none" />
+        <line x1="4" y1="17" x2="20" y2="17" />
+        <circle cx="11" cy="17" r="1.8" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Realizace na klíč',
+    description:
+      'Od projektové dokumentace po předání hotového interiéru. Koordinace řemeslníků i autorský dozor.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+        <rect x="4" y="4" width="7" height="7" />
+        <rect x="13" y="4" width="7" height="7" />
+        <rect x="4" y="13" width="7" height="7" />
+        <rect x="13" y="13" width="7" height="7" />
+      </svg>
+    ),
+  },
+];
+
+const testimonial = {
+  quote:
+    'Lucy vytvořila interiér, který přesně odpovídá našemu životnímu stylu. Každý detail byl promyšlený a celý proces byl naprosto profesionální.',
+  name: 'Klára Novotná',
+  role: 'Klient, Praha',
+  image: '/images/about.jpg',
+};
+
+function formatDate(iso: string) {
+  const [y, m, d] = iso.split('-');
+  return `${parseInt(d, 10)}. ${parseInt(m, 10)}. ${y.slice(2)}`;
+}
+
 export default function Home() {
-  // Vezmi první 3 projekty pro sekci "Vybrané projekty"
-  const featuredProjects = projects.slice(0, 3);
+  const featuredProject = projects[0];
+  const homeProjects = projects.slice(0, 3);
+  const homePosts = posts.slice(0, 3);
 
   return (
     <>
-      {/* Hero Section */}
+      {/* === HERO === */}
       <section className={styles.hero}>
         <div className={styles.heroImage}>
           <Image
             src="/images/hero.jpg"
-            alt="Interiérový design v Praze"
+            alt="Interiér v Praze"
             fill
             priority
             sizes="100vw"
-            className={styles.heroImageContent}
             style={{ objectFit: 'cover' }}
           />
-          <div className={styles.heroOverlay}></div>
+          <div className={styles.heroOverlay} />
         </div>
-        <div className={`container ${styles.heroContent}`}>
-          <h1 className={styles.heroTitle}>Lucy Design</h1>
-          <p className={styles.heroText}>
-            Nadčasové interiéry v Praze. Od konceptu po realizaci.
-          </p>
-          <div className={styles.heroCtas}>
-            <Link href="/kontakt" className={styles.ctaPrimary}>
+
+        <div className={`container ${styles.heroInner}`}>
+          <div className={styles.heroText}>
+            <span className="eyebrow eyebrow--light">Studio v Praze</span>
+            <h1 className={styles.heroTitle}>
+              Interiér,
+              <br />
+              který má&nbsp;smysl.
+            </h1>
+            <Link href="/kontakt" className="btn btn--outline-light">
               Domluvit konzultaci
             </Link>
-            <Link href="/projekty" className={styles.ctaSecondary}>
-              Prohlédnout projekty
-            </Link>
           </div>
+
+          <a href="#sluzby" className={styles.scrollDown} aria-label="Posunout na další sekci">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <polyline points="6 13 12 19 18 13" />
+            </svg>
+          </a>
+        </div>
+
+        <Link href={`/projekty/${featuredProject.slug}`} className={styles.heroFeatured}>
+          <span className={styles.heroFeaturedSide}>Vybrané</span>
+          <div className={styles.heroFeaturedBody}>
+            <span className="eyebrow">{featuredProject.location}, {featuredProject.year}</span>
+            <span className={styles.heroFeaturedTitle}>{featuredProject.title}</span>
+          </div>
+        </Link>
+      </section>
+
+      {/* === SLUŽBY === */}
+      <section id="sluzby" className="section">
+        <div className="container">
+          <Reveal>
+            <div className={styles.sectionHeader}>
+              <div>
+                <span className="eyebrow">Služby</span>
+                <h2 className={styles.sectionTitle}>Co umím nejlépe.</h2>
+              </div>
+              <Link href="/sluzby" className="btn">
+                Všechny služby
+              </Link>
+            </div>
+          </Reveal>
+
+          <Reveal delay={100}>
+            <div className={styles.servicesGrid}>
+              {services.map((service) => (
+                <div key={service.title} className={styles.serviceCard}>
+                  <div className={styles.serviceIcon}>{service.icon}</div>
+                  <h3 className={styles.serviceTitle}>{service.title}</h3>
+                  <p className={styles.serviceText}>{service.description}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* Editorial Intro */}
+      {/* === DARK QUOTE / O LUCY === */}
       <Reveal>
-        <section className={`section ${styles.editorialIntro}`}>
-          <div className="container">
-            <div className={styles.editorialGrid}>
-              <div className={styles.editorialText}>
-                <p>
-                  Věřím, že každý prostor má svůj příběh. Naslouchám vašim potřebám a vytvářím interiéry, 
-                  které jsou nejen krásné, ale především funkční a autentické.
-                </p>
-                <p>
-                  Společně proměníme váš domov v místo, kde se budete cítit skutečně doma.
-                </p>
-                <p className={styles.editorialMeta}>
-                  Oblast: Praha a okolí
-                </p>
-              </div>
-              <div className={styles.editorialImage}>
-                <Image
-                  src="/images/about.jpg"
-                  alt="O přístupu k interiérovému designu"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className={styles.editorialImageContent}
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
+        <section className={styles.quoteSection}>
+          <div className={styles.quoteImage}>
+            <Image
+              src="/images/about.jpg"
+              alt="Interiér od Lucy Design"
+              fill
+              sizes="100vw"
+              style={{ objectFit: 'cover' }}
+            />
+            <div className={styles.quoteOverlay} />
+          </div>
+          <div className={`container ${styles.quoteInner}`}>
+            <span className="eyebrow eyebrow--light">O Lucy</span>
+            <p className={styles.quoteText}>
+              Věřím, že každý prostor má svůj příběh — a každý domov by měl
+              odrážet osobnost a životní styl těch, kdo v něm bydlí.
+            </p>
+            <div className={styles.quoteAuthor}>
+              <span className="eyebrow eyebrow--light">Lucy, Interiérová designérka</span>
             </div>
           </div>
         </section>
       </Reveal>
 
-      {/* Vybrané projekty */}
-      <Reveal delay={100}>
-        <section className={`section ${styles.featuredProjects}`}>
-          <div className="container">
-            <h2 className={styles.sectionTitle}>Vybrané projekty</h2>
-            <div className={styles.featuredGrid}>
-              {featuredProjects.map((project) => (
+      {/* === PROJEKTY === */}
+      <section className={`section ${styles.projectsSection}`}>
+        <div className="container">
+          <Reveal>
+            <div className={styles.projectsIntro}>
+              <span className="eyebrow eyebrow--light">Moje práce</span>
+              <h2 className={styles.projectsHeadline}>
+                Podívejte se,<br />co spolu vytvoříme.
+              </h2>
+              <Link href="/projekty" className="btn btn--outline-light">
+                Všechny projekty
+              </Link>
+            </div>
+          </Reveal>
+
+          <Reveal delay={100}>
+            <div className={styles.projectsGrid}>
+              {homeProjects.map((project, idx) => (
                 <Link
                   key={project.slug}
                   href={`/projekty/${project.slug}`}
-                  className={styles.featuredCard}
+                  className={`${styles.projectCard} ${idx === 1 ? styles.projectCardOffset : ''}`}
                 >
-                  <div className={styles.featuredImage}>
+                  <div className={styles.projectImage}>
                     <Image
                       src={project.images[0]}
                       alt={project.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className={styles.featuredImageContent}
                       style={{ objectFit: 'cover' }}
                     />
+                    <div className={styles.projectGradient} />
                   </div>
-                  <div className={styles.featuredInfo}>
-                    <h3 className={styles.featuredTitle}>{project.title}</h3>
-                    <span className={styles.featuredYear}>{project.year}</span>
+                  <div className={styles.projectOverlay}>
+                    <span className={`eyebrow eyebrow--light ${styles.projectLocation}`}>
+                      {project.location}, {project.year.slice(2)}
+                    </span>
+                    <h3 className={styles.projectTitle}>{project.title}</h3>
                   </div>
+                  <span className={styles.projectDate}>
+                    {project.year}
+                  </span>
                 </Link>
               ))}
             </div>
-            <div className={styles.featuredLink}>
-              <Link href="/projekty">Zobrazit všechny projekty</Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* === FEATURED TESTIMONIAL (dark slider) === */}
+      <Reveal>
+        <section className={styles.testimonialSection}>
+          <div className={styles.testimonialImage}>
+            <Image
+              src={testimonial.image}
+              alt={testimonial.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
+          <div className={styles.testimonialContent}>
+            <div className={styles.testimonialBody}>
+              <h2 className={styles.testimonialName}>{testimonial.name}</h2>
+              <p className={styles.testimonialQuote}>{testimonial.quote}</p>
+              <span className={`eyebrow eyebrow--light ${styles.testimonialRole}`}>
+                {testimonial.role}
+              </span>
             </div>
           </div>
         </section>
       </Reveal>
 
-      {/* Služby Preview */}
-      <Reveal delay={150}>
-        <section className={`section ${styles.services}`}>
-          <div className="container">
-            <h2 className={styles.sectionTitle}>Služby</h2>
-            <div className={styles.servicesGrid}>
-              <div className={styles.serviceCard}>
-                <h3 className={styles.serviceTitle}>Interiérový koncept a dispozice</h3>
-                <p className={styles.serviceText}>
-                  Komplexní návrh prostoru s ohledem na vaše potřeby a životní styl.
-                </p>
+      {/* === O AUTORCE (Behind the design) === */}
+      <section className="section">
+        <div className="container">
+          <Reveal>
+            <div className={styles.sectionHeader}>
+              <div>
+                <span className="eyebrow">O autorce</span>
+                <h2 className={styles.sectionTitle}>Za designem.</h2>
               </div>
-              <div className={styles.serviceCard}>
-                <h3 className={styles.serviceTitle}>Návrh nábytku na míru</h3>
-                <p className={styles.serviceText}>
-                  Jedinečné kusy navržené přesně pro váš prostor a vkus.
-                </p>
-              </div>
-              <div className={styles.serviceCard}>
-                <h3 className={styles.serviceTitle}>Výběr nábytku a doplňků</h3>
-                <p className={styles.serviceText}>
-                  Kurátorský výběr kusů, které dokonale ladí s celkovou koncepcí.
-                </p>
-              </div>
-              <div className={styles.serviceCard}>
-                <h3 className={styles.serviceTitle}>Materiály a povrchy</h3>
-                <p className={styles.serviceText}>
-                  Pečlivý výběr materiálů pro podlahy, stěny a další povrchy.
-                </p>
-              </div>
-              <div className={styles.serviceCard}>
-                <h3 className={styles.serviceTitle}>Kompletní rekonstrukce na klíč</h3>
-                <p className={styles.serviceText}>
-                  Od projektu až po finální realizaci – vše pod jednou střechou.
-                </p>
-              </div>
-              <div className={styles.serviceCard}>
-                <h3 className={styles.serviceTitle}>Autorský dozor</h3>
-                <p className={styles.serviceText}>
-                  Zajištění kvality a souladu s návrhem během celé realizace.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </Reveal>
-
-      {/* Jak to funguje */}
-      <Reveal delay={200}>
-        <section className={`section ${styles.process}`}>
-          <div className="container">
-            <h2 className={styles.sectionTitle}>Jak to funguje</h2>
-            <div className={styles.processGrid}>
-              <div className={styles.processStep}>
-                <div className={styles.processNumber}>01</div>
-                <h3 className={styles.processTitle}>Konzultace</h3>
-                <p className={styles.processText}>
-                  Společně probereme vaše představy, potřeby a představíme si finální podobu prostoru.
-                </p>
-              </div>
-              <div className={styles.processStep}>
-                <div className={styles.processNumber}>02</div>
-                <h3 className={styles.processTitle}>Koncept</h3>
-                <p className={styles.processText}>
-                  Vytvořím komplexní návrh včetně dispozice, barev, materiálů a klíčových prvků.
-                </p>
-              </div>
-              <div className={styles.processStep}>
-                <div className={styles.processNumber}>03</div>
-                <h3 className={styles.processTitle}>Detail</h3>
-                <p className={styles.processText}>
-                  Provedeme detailní rozpracování projektu a výběr konkrétních produktů a materiálů.
-                </p>
-              </div>
-              <div className={styles.processStep}>
-                <div className={styles.processNumber}>04</div>
-                <h3 className={styles.processTitle}>Realizace</h3>
-                <p className={styles.processText}>
-                  Zajistím koordinaci a dozor nad realizací, aby vše proběhlo podle plánu.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </Reveal>
-
-      {/* Reference */}
-      <Reveal delay={250}>
-        <section className={`section ${styles.testimonials}`}>
-          <div className="container">
-            <h2 className={styles.sectionTitle}>Reference</h2>
-            <div className={styles.testimonialsGrid}>
-              <div className={styles.testimonial}>
-                <p className={styles.testimonialText}>
-                  "Lucy vytvořila interiér, který přesně odpovídá našemu životnímu stylu. Každý detail byl promyšlený."
-                </p>
-                <p className={styles.testimonialAuthor}>— Klient, Praha</p>
-              </div>
-              <div className={styles.testimonial}>
-                <p className={styles.testimonialText}>
-                  "Profesionální přístup od začátku do konce. Spolupráce byla skvělá a výsledek předčil očekávání."
-                </p>
-                <p className={styles.testimonialAuthor}>— Klient, Praha</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </Reveal>
-
-      {/* CTA Pás */}
-      <Reveal delay={300}>
-        <section className={`section ${styles.ctaSection}`}>
-          <div className="container">
-            <div className={styles.ctaBox}>
-              <p className={styles.ctaText}>
-                Napište mi o vašem projektu – ozvu se do 48 hodin.
-              </p>
-              <Link href="/kontakt" className={styles.ctaPrimary}>
-                Kontaktovat
+              <Link href="/o-mne" className="btn">
+                Více o Lucy
               </Link>
             </div>
+          </Reveal>
+
+          <Reveal delay={100}>
+            <div className={styles.authorGrid}>
+              <Link href="/o-mne" className={styles.authorCard}>
+                <div className={styles.authorImage}>
+                  <Image
+                    src="/images/about.jpg"
+                    alt="Lucy — interiérová designérka"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+                <div className={styles.authorOverlay}>
+                  <h3 className={styles.authorName}>Lucy</h3>
+                  <span className={`eyebrow eyebrow--light ${styles.authorRole}`}>Designérka</span>
+                </div>
+              </Link>
+
+              <div className={styles.authorBio}>
+                <p>
+                  Jmenuji se Lucy a věnuji se interiérovému designu v Praze. 
+                  Mým cílem je vytvořit prostor, kde se každý den budete cítit
+                  doma — od první konzultace po předání klíčů.
+                </p>
+                <p>
+                  Specializuji se na byty a rodinné domy v Praze a okolí. 
+                  Spolupracuji s vybranými řemeslníky a dodavateli, kteří 
+                  sdílí stejný důraz na kvalitu a detail.
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* === AKTUALITY / BLOG === */}
+      <section className={`section ${styles.postsSection}`}>
+        <div className="container">
+          <div className={styles.postsLayout}>
+            <aside className={styles.postsSidebar}>
+              <span className="eyebrow">Kategorie</span>
+              <ul className={styles.categoryList}>
+                {categories.map((cat) => (
+                  <li key={cat}>
+                    <Link href="/aktuality" className={styles.categoryLink}>
+                      {cat}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+
+            <div className={styles.postsMain}>
+              <Reveal>
+                <div className={styles.postsHeader}>
+                  <div>
+                    <span className="eyebrow">Aktuality</span>
+                    <h2 className={styles.sectionTitle}>Co je nového?</h2>
+                  </div>
+                  <Link href="/aktuality" className="btn">
+                    Všechny články
+                  </Link>
+                </div>
+              </Reveal>
+
+              <Reveal delay={100}>
+                <div className={styles.postsGrid}>
+                  {homePosts.map((post) => (
+                    <Link
+                      key={post.slug}
+                      href={`/aktuality#${post.slug}`}
+                      className={styles.postCard}
+                    >
+                      <div className={styles.postImage}>
+                        <Image
+                          src={post.image}
+                          alt={post.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </div>
+                      <h3 className={styles.postTitle}>{post.title}</h3>
+                      <p className={styles.postExcerpt}>{post.excerpt}</p>
+                      <div className={styles.postMeta}>
+                        <span className="eyebrow">{post.category}</span>
+                        <span className={styles.postDate}>{formatDate(post.date)}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
           </div>
-        </section>
-      </Reveal>
+        </div>
+      </section>
     </>
   );
 }
